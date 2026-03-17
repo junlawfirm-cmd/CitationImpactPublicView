@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIW Citation Impact Analyzer</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: #d9e2ec;
+      --brand: #123b70;
+      --brand-2: #285ea8;
+      --accent: #b58a2a;
+      --accent-soft: #fbf7ec;
+      --soft: #eef4fb;
+      --soft-2: #f8fafc;
+      --good: #0f766e;
+      --warn: #b45309;
+      --alert: #9f1239;
+      --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "LAW OFFICE OF HONG-MIN JUN P.C. • NIW ANALYTICAL FRAMEWORK";
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.2rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: rgba(18, 59, 112, 0.05);
+      transform: rotate(-28deg);
+      pointer-events: none;
+      z-index: 0;
+      text-align: center;
+      padding: 0 40px;
+      line-height: 1.35;
+      white-space: pre-wrap;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 26px 18px 56px;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      border-radius: 24px;
+      padding: 28px 30px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+    .firm {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.88;
+      margin-bottom: 10px;
+    }
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 1.12;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 980px;
+      color: rgba(255,255,255,0.9);
+      font-size: 1rem;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    button {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.18s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: #fff;
+      color: var(--brand);
+      font-weight: 700;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border-color: rgba(255,255,255,0.28);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 1.24rem;
+      color: var(--brand);
+    }
+    .sub {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .intro-panel {
+      background: var(--accent-soft);
+      border: 1px solid #eddcab;
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: #694f10;
+      font-size: 0.93rem;
+      margin-bottom: 16px;
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 16px;
+    }
+    .field-grid.one { grid-template-columns: 1fr; }
+    .field-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    label {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #22354d;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: #fff;
+      font-family: inherit;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 84px;
+    }
+    .small-note {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .paper {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fdfefe;
+      margin-bottom: 14px;
+    }
+    .paper-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .paper-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brand);
+    }
+    .paper-actions button {
+      background: #fff1f2;
+      color: var(--alert);
+      border: 1px solid #fecdd3;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--soft);
+      border: 1px solid #d7e8fb;
+      color: #274d7e;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+    }
+    .pill input { width: auto; }
+    .result-block {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .result-block h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: var(--brand);
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      margin: 0 6px 8px 0;
+    }
+    .badge-blue { background: #e7f0ff; color: #1d4ed8; }
+    .badge-gold { background: #faf1db; color: #8a5b00; }
+    .badge-green { background: #e7faf4; color: var(--good); }
+    .badge-orange { background: #fff3e8; color: var(--warn); }
+    .warn {
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+    .soft-card {
+      background: var(--soft-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      color: #475467;
+      font-size: 0.93rem;
+    }
+    .quote-box {
+      background: #f8fbff;
+      border-left: 4px solid var(--brand-2);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.94rem;
+      color: #28405f;
+      margin-top: 10px;
+    }
+    .small { font-size: 0.88rem; color: var(--muted); }
+    .disclaimer {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fffaf5;
+      border: 1px solid #f3dbc2;
+      color: #7a4d1d;
+      font-size: 0.89rem;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #f5f9ff;
+      border: 1px solid #dbeafe;
+      color: #1e3a8a;
+      font-size: 0.9rem;
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.84rem;
+      white-space: pre-wrap;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      max-height: 260px;
+      overflow: auto;
+    }
+    details summary {
+      cursor: pointer;
+      color: var(--brand);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .field-grid, .field-grid.three { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; }
+      body::before { display: none; }
+      .no-print { display: none !important; }
+      .card, .hero { box-shadow: none; }
+      .wrap { max-width: 100%; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="firm">LAW OFFICE OF HONG-MIN JUN P.C.</div>
+      <h1>NIW Citation Impact Analyzer</h1>
+      <p>
+        This public-facing tool is designed to help a researcher reconsider a publication record from an NIW perspective. It does not provide a legal conclusion, does not predict approval, and does not disclose this office's internal adjudication methodology. Instead, it organizes the record into research trajectory, citation quality, development pattern, and public-facing analytical observations.
+      </p>
+      <p style="margin-top:10px;color:rgba(255,255,255,0.88);font-size:0.95rem;">Public version only. Internal scoring logic, weighting, and adjudication thresholds are intentionally withheld.</p>
+      <div class="toolbar no-print">
+        <button class="btn-primary" id="analyzeBtn">Generate Analysis</button>
+        <button class="btn-secondary" id="addPaperBtn">Add Publication</button>
+        <button class="btn-secondary" id="loadSampleBtn">Load Sample</button>
+        <button class="btn-secondary" id="printBtn">Print / Save PDF</button>
+        <button class="btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div>
+        <section class="card">
+          <h2>1. CV Upload and Auto-Draft</h2>
+          <p class="sub">Upload a CV in DOCX, TXT, or PDF format. The tool will attempt to extract text, identify publication-like lines, estimate authorship role, infer current research, and populate a draft for later correction.</p>
+          <div class="field-grid three">
+            <div>
+              <label for="cvFile">Upload CV</label>
+              <input type="file" id="cvFile" accept=".docx,.txt,.pdf" />
+              <div class="small-note">DOCX and TXT are the most reliable. PDF extraction quality depends on the file structure.</div>
+            </div>
+            <div>
+              <label for="applicantName">Applicant Name</label>
+              <input type="text" id="applicantName" placeholder="Yeeun Bae" />
+            </div>
+            <div>
+              <label for="currentOrg">Current Institution / Position</label>
+              <input type="text" id="currentOrg" placeholder="Indiana University, Postdoctoral Researcher" />
+            </div>
+          </div>
+          <div class="toolbar no-print" style="margin-top:14px;">
+            <button class="btn-primary" id="extractCvBtn" type="button">Extract CV and Draft</button>
+            <button class="btn-secondary" id="parsePublicationsBtn" type="button">Parse Publications Only</button>
+          </div>
+          <div id="uploadStatus" class="status">No file loaded yet.</div>
+          <details style="margin-top:14px;">
+            <summary>Preview extracted text</summary>
+            <div id="cvTextPreview" class="mono">No extracted text yet.</div>
+          </details>
+        </section>
+
+        <section class="card">
+          <h2>2. Why This Tool Exists</h2>
+          <p class="sub">The question is not whether a citation number is “high enough.” The question is what the publication record actually says about the applicant’s research influence.</p>
+          <div class="intro-panel">
+            This framework is intended to move beyond a raw publication list and toward a more coherent view of research impact. It asks whether the publications form a trajectory, whether the current research grows out of that trajectory, and whether outside researchers, institutions, or technical users have engaged meaningfully with the work.
+          </div>
+          <div class="quote-box">
+            In NIW analysis, the issue is not merely how many papers exist or how many citations appear. The more important question is whether the research can be understood as a meaningful and developing body of work.
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>3. Current Research and NIW Perspective</h2>
+          <p class="sub">Describe the present research and how it should be understood from the standpoint of merit, importance, and continuity.</p>
+          <div class="field-grid one">
+            <div>
+              <label for="currentResearch">Current Research / Current Project</label>
+              <textarea id="currentResearch" placeholder="Describe the current research, technical problem, or project the applicant is working on."></textarea>
+            </div>
+            <div>
+              <label for="currentImportance">Why This Work Matters</label>
+              <textarea id="currentImportance" placeholder="Explain why the present research matters academically, technologically, industrially, medically, or otherwise."></textarea>
+            </div>
+            <div>
+              <label for="researchConnection">How Current Work Grows Out of Prior Publications</label>
+              <textarea id="researchConnection" placeholder="Explain how the present work extends, deepens, or applies the applicant’s earlier publications."></textarea>
+            </div>
+            <div>
+              <label for="fieldContext">Field Context</label>
+              <textarea id="fieldContext" placeholder="Describe the field context, including whether citation patterns in this field are generally high, moderate, or low."></textarea>
+              <div class="small-note">A citation count should always be interpreted in the context of the field rather than in the abstract.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>4. Publication Record</h2>
+          <p class="sub">Enter the key publications. The auto-draft can populate this section, but the user should still review and refine the entries.</p>
+          <div id="papersContainer"></div>
+          <button class="btn-primary no-print" id="addPaperBtnBottom" type="button">Add Another Publication</button>
+        </section>
+
+        <section class="card">
+          <h2>5. Broader Context</h2>
+          <p class="sub">These additional facts often change the legal and strategic reading of the publication record.</p>
+          <div class="field-grid">
+            <div>
+              <label for="independentRecognition">Independent Recognition</label>
+              <textarea id="independentRecognition" placeholder="Identify invited talks, external references, peer review activity, expert recognition, editorial roles, or other evidence showing recognition beyond the applicant’s own circle."></textarea>
+            </div>
+            <div>
+              <label for="translationEvidence">Translation Beyond Academia</label>
+              <textarea id="translationEvidence" placeholder="Describe patents, products, industry collaboration, standards, implementation, regulatory relevance, or technical use."></textarea>
+            </div>
+            <div>
+              <label for="geographicSpread">Geographic / Institutional Spread</label>
+              <textarea id="geographicSpread" placeholder="List countries, universities, national labs, hospitals, companies, or agencies that have cited or used the work."></textarea>
+            </div>
+            <div>
+              <label for="reflectionInput">Research Reflection</label>
+              <textarea id="reflectionInput" placeholder="What does this record suggest about the applicant’s role in the field? What changed because this work exists?"></textarea>
+            </div>
+            <div>
+              <label for="attorneyNotesInput">Attorney Notes / Strategic Concerns</label>
+              <textarea id="attorneyNotesInput" placeholder="Add evidence gaps, legal caution points, possible reframing, or exhibit needs."></textarea>
+            </div>
+            <div>
+              <label for="clientFacingNotes">Client-Facing Observations</label>
+              <textarea id="clientFacingNotes" placeholder="Add practical observations that may be shown to the applicant, such as where the record looks strongest or where further evidence may be helpful."></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="card">
+          <h2>Generated Analysis</h2>
+          <p class="sub">This output is designed to read like a public-facing analytical memorandum rather than a scoring calculator or legal decision tool.</p>
+          <div id="resultsArea">
+            <div class="soft-card">
+              After entering the research and publication record, click <strong>Generate Analysis</strong>. The tool will produce a narrative assessment showing how the record may be understood from an NIW perspective, including indicators of influence, issues requiring caution, and framing points for legal analysis.
+            </div>
+          </div>
+          <div class="disclaimer">
+            Disclaimer: This tool provides a structural and educational preview only. It does not evaluate eligibility, does not predict approval, and does not substitute for legal analysis by a licensed attorney. Any interpretation without full review may lead to incorrect conclusions. The analytical framework used by this office is not fully disclosed in this public version.
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <template id="paperTemplate">
+    <div class="paper">
+      <div class="paper-head">
+        <div class="paper-title">Publication <span class="paper-number"></span></div>
+        <div class="paper-actions no-print">
+          <button type="button" class="remove-paper">Remove</button>
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <div>
+          <label>Paper Title</label>
+          <input type="text" class="paper-title-input" placeholder="Title of publication" />
+        </div>
+        <div>
+          <label>Publication Year</label>
+          <input type="number" class="paper-year" min="1900" max="2100" placeholder="2023" />
+        </div>
+        <div>
+          <label>Total Citations</label>
+          <input type="number" class="paper-citations" min="0" placeholder="68" />
+        </div>
+        <div>
+          <label>Recent Citations (Last 3 Years)</label>
+          <input type="number" class="paper-recent-citations" min="0" placeholder="35" />
+        </div>
+        <div>
+          <label>Authorship Role</label>
+          <select class="paper-authorship">
+            <option value="">Select</option>
+            <option value="first">First Author</option>
+            <option value="cofirst">Co-First Author</option>
+            <option value="second">Second Author</option>
+            <option value="corresponding">Corresponding Author</option>
+            <option value="senior">Senior / Last Author</option>
+            <option value="coauthor">Other Co-Author</option>
+          </select>
+        </div>
+        <div>
+          <label>Journal Standing</label>
+          <select class="paper-journal-standing">
+            <option value="">Select</option>
+            <option value="top">Widely recognized / leading journal</option>
+            <option value="strong">Strong specialty journal</option>
+            <option value="moderate">Moderate / field-appropriate journal</option>
+            <option value="unclear">Unclear or lower visibility journal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-grid one" style="margin-top: 14px;">
+        <div>
+          <label>Google Scholar Search Assist</label>
+          <div class="field-grid three">
+            <div>
+              <input type="text" class="paper-scholar-query" placeholder="Optional custom Scholar query" />
+            </div>
+            <div>
+              <button type="button" class="scholar-search-btn no-print" style="background:#eef4fb;color:#123b70;border:1px solid #d7e8fb;">Open Scholar Search</button>
+            </div>
+            <div>
+              <button type="button" class="fill-citation-btn no-print" style="background:#fbf7ec;color:#8a5b00;border:1px solid #eddcab;">Apply Citation Notes</button>
+            </div>
+          </div>
+          <div class="small-note">Use Google Scholar in a separate tab to check citation count, recent citation growth, and notable citing institutions. Then enter that information here and let the tool fold it into the analysis.</div>
+        </div>
+        <div>
+          <label>Relation to Current Research</label>
+          <textarea class="paper-link-current" placeholder="Explain how this publication connects to the current research or proposed endeavor."></textarea>
+        </div>
+        <div>
+          <label>Citation Quality</label>
+          <textarea class="paper-citation-quality" placeholder="Describe who cited the work, whether the citations are independent, whether leading groups relied on it, and whether self-citation is a concern."></textarea>
+        </div>
+        <div>
+          <label>Patent / Technical / Industry Linkage</label>
+          <textarea class="paper-patent-link" placeholder="Explain whether this paper is linked to patents, products, methods, standards, or technical implementation."></textarea>
+        </div>
+        <div>
+          <label>Role in Research Development</label>
+          <textarea class="paper-development-role" placeholder="Explain whether this publication introduced the method, expanded the theory, deepened the evidence, or opened a later line of work."></textarea>
+        </div>
+      </div>
+
+      <div class="field-grid three" style="margin-top: 12px;">
+        <div>
+          <label>Scholar Citation Notes</label>
+          <textarea class="paper-scholar-notes" placeholder="Optional notes from Google Scholar, such as top citing institutions or notable independent citations."></textarea>
+        </div>
+        <div>
+          <label>Top Citing Sources / Institutions</label>
+          <textarea class="paper-citing-sources" placeholder="Examples: NIH, Harvard, Mayo Clinic, Seoul National University, industry group, standards body."></textarea>
+        </div>
+        <div>
+          <label>Citation Trend / Quality Notes</label>
+          <textarea class="paper-citation-trend" placeholder="Examples: most citations occurred in the last 3 years; citations are mostly independent; citations came from clinical imaging groups."></textarea>
+        </div>
+      </div>
+
+      <div class="pill-row">
+        <label class="pill"><input type="checkbox" class="flag-core" /> Core publication</label>
+        <label class="pill"><input type="checkbox" class="flag-independent" /> Clear independent citation support</label>
+        <label class="pill"><input type="checkbox" class="flag-self-citation-concern" /> Self-citation concern</label>
+        <label class="pill"><input type="checkbox" class="flag-patent" /> Linked to patent / implementation</label>
+        <label class="pill"><input type="checkbox" class="flag-method-adoption" /> Method adopted by others</label>
+      </div>
+    </div>
+  </template>
+
+  <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs" type="module"></script>
+  <script>
+    const papersContainer = document.getElementById('papersContainer');
+    const paperTemplate = document.getElementById('paperTemplate');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const addPaperBtn = document.getElementById('addPaperBtn');
+    const addPaperBtnBottom = document.getElementById('addPaperBtnBottom');
+    const loadSampleBtn = document.getElementById('loadSampleBtn');
+    const printBtn = document.getElementById('printBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultsArea = document.getElementById('resultsArea');
+    const cvFileInput = document.getElementById('cvFile');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const cvTextPreview = document.getElementById('cvTextPreview');
+    const extractCvBtn = document.getElementById('extractCvBtn');
+    const parsePublicationsBtn = document.getElementById('parsePublicationsBtn');
+
+    let extractedCvText = '';
+
+    function addPaper(data = {}) {
+      const clone = paperTemplate.content.firstElementChild.cloneNode(true);
+      papersContainer.appendChild(clone);
+      renumberPapers();
+      const paper = papersContainer.lastElementChild;
+      fillPaper(paper, data);
+      paper.querySelector('.remove-paper').addEventListener('click', () => {
+        paper.remove();
+        renumberPapers();
+      });
+    }
+
+    function renumberPapers() {
+      [...papersContainer.querySelectorAll('.paper')].forEach((paper, idx) => {
+        paper.querySelector('.paper-number').textContent = idx + 1;
+      });
+    }
+
+    function fillPaper(paper, data) {
+      paper.querySelector('.paper-title-input').value = data.title || '';
+      paper.querySelector('.paper-year').value = data.year || '';
+      paper.querySelector('.paper-citations').value = data.citations ?? '';
+      paper.querySelector('.paper-recent-citations').value = data.recentCitations ?? '';
+      paper.querySelector('.paper-authorship').value = data.authorship || '';
+      paper.querySelector('.paper-journal-standing').value = data.journalStanding || '';
+      paper.querySelector('.paper-link-current').value = data.linkToCurrent || '';
+      paper.querySelector('.paper-citation-quality').value = data.citationQuality || '';
+      paper.querySelector('.paper-patent-link').value = data.patentLink || '';
+      paper.querySelector('.paper-development-role').value = data.developmentRole || '';
+      if (paper.querySelector('.paper-scholar-query')) paper.querySelector('.paper-scholar-query').value = data.scholarQuery || '';
+      if (paper.querySelector('.paper-scholar-notes')) paper.querySelector('.paper-scholar-notes').value = data.scholarNotes || '';
+      if (paper.querySelector('.paper-citing-sources')) paper.querySelector('.paper-citing-sources').value = data.citingSources || '';
+      if (paper.querySelector('.paper-citation-trend')) paper.querySelector('.paper-citation-trend').value = data.citationTrend || '';
+      paper.querySelector('.flag-core').checked = !!data.core;
+      paper.querySelector('.flag-independent').checked = !!data.independent;
+      paper.querySelector('.flag-self-citation-concern').checked = !!data.selfConcern;
+      paper.querySelector('.flag-patent').checked = !!data.patent;
+      paper.querySelector('.flag-method-adoption').checked = !!data.methodAdoption;
+
+      const scholarBtn = paper.querySelector('.scholar-search-btn');
+      const fillBtn = paper.querySelector('.fill-citation-btn');
+      if (scholarBtn) {
+        scholarBtn.addEventListener('click', () => {
+          const title = paper.querySelector('.paper-title-input').value.trim();
+          const custom = paper.querySelector('.paper-scholar-query')?.value.trim() || '';
+          const query = custom || title;
+          if (!query) {
+            alert('Enter a paper title or a custom Scholar query first.');
+            return;
+          }
+          const url = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(query);
+          window.open(url, '_blank', 'noopener,noreferrer');
+        });
+      }
+      if (fillBtn) {
+        fillBtn.addEventListener('click', () => {
+          const total = paper.querySelector('.paper-citations').value.trim();
+          const recent = paper.querySelector('.paper-recent-citations').value.trim();
+          const mergedNotes = [
+            paper.querySelector('.paper-scholar-notes')?.value.trim(),
+            paper.querySelector('.paper-citing-sources')?.value.trim(),
+            paper.querySelector('.paper-citation-trend')?.value.trim()
+          ].filter(Boolean).join(' ');
+          if (mergedNotes && !paper.querySelector('.paper-citation-quality').value.trim()) {
+            paper.querySelector('.paper-citation-quality').value = mergedNotes;
+          }
+          if ((Number(total || 0) >= 20 || Number(recent || 0) >= 10) && !paper.querySelector('.flag-independent').checked) {
+            paper.querySelector('.flag-independent').checked = true;
+          }
+          if (Number(recent || 0) >= Math.max(5, Math.floor(Number(total || 0) * 0.35)) && !paper.querySelector('.flag-method-adoption').checked) {
+            paper.querySelector('.flag-method-adoption').checked = true;
+          }
+        });
+      }
+    }
+
+    function readPaper(paper) {
+      return {
+        title: paper.querySelector('.paper-title-input').value.trim(),
+        year: Number(paper.querySelector('.paper-year').value || 0),
+        citations: Number(paper.querySelector('.paper-citations').value || 0),
+        recentCitations: Number(paper.querySelector('.paper-recent-citations').value || 0),
+        authorship: paper.querySelector('.paper-authorship').value,
+        journalStanding: paper.querySelector('.paper-journal-standing').value,
+        linkToCurrent: paper.querySelector('.paper-link-current').value.trim(),
+        citationQuality: paper.querySelector('.paper-citation-quality').value.trim(),
+        patentLink: paper.querySelector('.paper-patent-link').value.trim(),
+        developmentRole: paper.querySelector('.paper-development-role').value.trim(),
+        core: paper.querySelector('.flag-core').checked,
+        independent: paper.querySelector('.flag-independent').checked,
+        selfConcern: paper.querySelector('.flag-self-citation-concern').checked,
+        patent: paper.querySelector('.flag-patent').checked,
+        methodAdoption: paper.querySelector('.flag-method-adoption').checked,
+        scholarQuery: paper.querySelector('.paper-scholar-query')?.value.trim() || '',
+        scholarNotes: paper.querySelector('.paper-scholar-notes')?.value.trim() || '',
+        citingSources: paper.querySelector('.paper-citing-sources')?.value.trim() || '',
+        citationTrend: paper.querySelector('.paper-citation-trend')?.value.trim() || '',
+      };
+    }
+
+    function textValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatAuthorship(value) {
+      const map = {
+        first: 'First Author',
+        cofirst: 'Co-First Author',
+        second: 'Second Author',
+        corresponding: 'Corresponding Author',
+        senior: 'Senior / Last Author',
+        coauthor: 'Other Co-Author'
+      };
+      return map[value] || '—';
+    }
+
+    function formatJournal(value) {
+      const map = {
+        top: 'Widely recognized / leading journal',
+        strong: 'Strong specialty journal',
+        moderate: 'Moderate / field-appropriate journal',
+        unclear: 'Unclear or lower visibility journal'
+      };
+      return map[value] || '—';
+    }
+
+    function sentenceFromList(list) {
+      return list.length ? list.join(' ') : '';
+    }
+
+    function normalizeWhitespace(text) {
+      return (text || '')
+        .replace(/\u00A0/g, ' ')
+        .replace(/\r/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]{2,}/g, ' ')
+        .trim();
+    }
+
+    function inferCurrentResearch(text) {
+      const lower = text.toLowerCase();
+      const lines = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+      const researchSection = extractSection(text, ['research experience', 'professional summary'], ['technical expertise', 'research publications', 'grants and fellowships']);
+      let currentResearch = '';
+      let importance = '';
+      let org = '';
+
+      const postdocLines = researchSection.split(/\n+/).filter(l => /postdoctoral|postdoctoral researcher|postdoctoral fellow|present/i.test(l));
+      const bulletLines = researchSection.split(/\n+/).filter(l => /^[-·•]/.test(l));
+      if (postdocLines.length) {
+        currentResearch = postdocLines.slice(0, 2).join(' ');
+      }
+      const presentBullets = bulletLines.filter(l => /leading independent research|investigating|focus|mechanism|memory|fear|stress|aging|dysfunction|neuro/i.test(l)).slice(0, 4);
+      if (presentBullets.length) {
+        currentResearch = [currentResearch, presentBullets.map(cleanBullet).join(' ')].filter(Boolean).join(' ');
+      }
+      if (!currentResearch) {
+        const summary = extractSection(text, ['professional summary'], ['education', 'research experience']);
+        currentResearch = summary.split(/\n+/).slice(0, 5).join(' ');
+      }
+
+      if (/alzheimer|dementia|neurodegenerative|memory decline|ptsd|fear memory|aging/i.test(lower)) {
+        importance = 'The record suggests relevance to neurological decline, fear-related dysregulation, memory impairment, or other brain-health concerns with biomedical significance.';
+      } else if (/cancer|oncology|transplant|kidney graft|immun/i.test(lower)) {
+        importance = 'The record suggests translational biomedical significance with potential relevance to disease mechanisms, therapy development, or clinical intervention.';
+      }
+
+      const orgLine = lines.find(l => /present|current|postdoctoral|postdoctoral fellow|postdoctoral researcher/i.test(l) && /university|institute|department/i.test(l));
+      if (orgLine) org = orgLine;
+
+      return {
+        currentResearch: normalizeWhitespace(currentResearch),
+        currentImportance: importance,
+        currentOrg: org
+      };
+    }
+
+    function cleanBullet(line) {
+      return line.replace(/^[-·•]\s*/, '').trim();
+    }
+
+    function extractSection(text, startMarkers, endMarkers) {
+      const lower = text.toLowerCase();
+      let start = -1;
+      for (const marker of startMarkers) {
+        const idx = lower.indexOf(marker.toLowerCase());
+        if (idx !== -1 && (start === -1 || idx < start)) start = idx;
+      }
+      if (start === -1) return '';
+      let end = text.length;
+      for (const marker of endMarkers) {
+        const idx = lower.indexOf(marker.toLowerCase(), start + 1);
+        if (idx !== -1 && idx < end) end = idx;
+      }
+      return text.slice(start, end).trim();
+    }
+
+    function parsePublications(text) {
+      const pubsSection = extractSection(text, ['research publications', 'publications', 'selected publications'], ['grants and fellowships', 'scientific conferences', 'teaching and professional experience', 'media coverage']);
+      const lines = pubsSection.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      const candidates = [];
+      let buffer = '';
+
+      for (const line of lines) {
+        if (/research publications|publications/i.test(line)) continue;
+        const looksLikeNewEntry = /\(20\d{2}\)|\b20\d{2}\b/.test(line) && /\./.test(line) && /,/.test(line);
+        if (looksLikeNewEntry && buffer) {
+          candidates.push(buffer.trim());
+          buffer = line;
+        } else {
+          buffer += (buffer ? ' ' : '') + line;
+        }
+      }
+      if (buffer) candidates.push(buffer.trim());
+
+      return candidates
+        .map(parsePublicationEntry)
+        .filter(Boolean)
+        .slice(0, 20);
+    }
+
+    function parsePublicationEntry(entry) {
+      const cleaned = normalizeWhitespace(entry);
+      if (!cleaned) return null;
+      const yearMatch = cleaned.match(/\((20\d{2})\)|\b(20\d{2})\b/);
+      const year = yearMatch ? Number(yearMatch[1] || yearMatch[2]) : '';
+
+      const titleMatch = cleaned.match(/\)\.\s*([^\.]+)\./);
+      let title = titleMatch ? titleMatch[1].trim() : '';
+      if (!title) {
+        const parts = cleaned.split('. ');
+        title = parts.length > 1 ? parts[1].trim() : cleaned.slice(0, 120);
+      }
+
+      let journalStanding = 'moderate';
+      if (/nature|science|cell|lancet|nejm|jama|jci|science translational medicine/i.test(cleaned)) {
+        journalStanding = 'top';
+      } else if (/neurobiology|hippocampus|plos one|brain res|frontiers|kidney360|breast cancer research/i.test(cleaned)) {
+        journalStanding = 'strong';
+      }
+
+      let authorship = 'coauthor';
+      const authorBlock = cleaned.split(yearMatch ? yearMatch[0] : '.')[0];
+      const appName = textValue('applicantName').trim();
+      const surname = appName ? appName.split(/\s+/).slice(-1)[0].replace(/[^A-Za-z]/g, '') : '';
+      const givenInitial = appName ? appName.split(/\s+/)[0][0] : '';
+      const normalized = authorBlock.replace(/\*/g, '');
+      const authorParts = normalized.split(',').map(a => a.trim()).filter(Boolean);
+      const idx = authorParts.findIndex(a => {
+        const lower = a.toLowerCase();
+        return surname && lower.includes(surname.toLowerCase()) || (givenInitial && surname && lower.includes(givenInitial.toLowerCase()) && lower.includes(surname.toLowerCase()));
+      });
+      if (idx === 0) authorship = 'first';
+      else if (idx === 1) authorship = 'second';
+      else if (/contributed equally/i.test(cleaned) && idx !== -1) authorship = 'cofirst';
+
+      const lower = cleaned.toLowerCase();
+      let linkToCurrent = '';
+      let developmentRole = '';
+      let patentLink = '';
+      let citationQuality = '';
+      let scholarQuery = title;
+      let core = false;
+      let methodAdoption = false;
+      let patent = false;
+      let independent = false;
+
+      if (/memory|amygdala|hippocampus|fear|aging|stress|neural|synaptic|dementia|cognitive/i.test(lower)) {
+        linkToCurrent = 'This publication appears potentially relevant to the applicant’s current neuroscience-oriented research trajectory.';
+        developmentRole = 'This publication may be part of the applicant’s developing work on memory, stress, circuit neuroscience, or molecular brain mechanisms.';
+        core = true;
+      }
+      if (/patent|translational|therapeutic|biomarker|graft survival|clinical/i.test(lower)) {
+        patentLink = 'This publication may have translational or application-oriented relevance and should be reviewed for technical or clinical linkage.';
+        patent = true;
+      }
+      if (/nature|science|cell|jci/i.test(lower)) {
+        citationQuality = 'Publication venue suggests substantial external review and possible independent visibility.';
+        independent = true;
+      }
+      if (/method|mechanism|regulates|enhances|drives|inhibition|analysis/i.test(lower)) {
+        methodAdoption = true;
+      }
+
+      return {
+        title,
+        year,
+        citations: '',
+        recentCitations: '',
+        authorship,
+        journalStanding,
+        linkToCurrent,
+        citationQuality,
+        patentLink,
+        developmentRole,
+        core,
+        independent,
+        selfConcern: false,
+        patent,
+        methodAdoption,
+        scholarQuery,
+        scholarNotes: '',
+        citingSources: '',
+        citationTrend: ''
+      };
+    }
+
+    function autoPopulateFromCv(text, onlyPubs = false) {
+      const inferred = inferCurrentResearch(text);
+      const parsedPubs = parsePublications(text);
+
+      if (!onlyPubs) {
+        if (inferred.currentResearch && !textValue('currentResearch')) document.getElementById('currentResearch').value = inferred.currentResearch;
+        if (inferred.currentImportance && !textValue('currentImportance')) document.getElementById('currentImportance').value = inferred.currentImportance;
+        if (inferred.currentOrg && !textValue('currentOrg')) document.getElementById('currentOrg').value = inferred.currentOrg;
+
+        const lower = text.toLowerCase();
+        if (!textValue('researchConnection')) {
+          if (/postdoctoral|postdoctoral researcher|present/i.test(lower) && /ph\.d\.|phd/i.test(lower)) {
+            document.getElementById('researchConnection').value = 'The CV suggests that the current research may build on doctoral publications and extend them into a more focused postdoctoral research program. This linkage should be reviewed and clarified by the user.';
+          }
+        }
+        if (!textValue('fieldContext')) {
+          if (/neuroscience|brain|memory|hippocampus|amygdala/i.test(lower)) {
+            document.getElementById('fieldContext').value = 'This appears to be a neuroscience-related record. Citation levels can vary substantially by subfield, and recent publications may still be accruing citations.';
+          } else if (/cancer|immunology|transplant/i.test(lower)) {
+            document.getElementById('fieldContext').value = 'This appears to involve biomedical science. Citation levels should be interpreted in light of publication year, field norms, and the relative visibility of the journal.';
+          }
+        }
+      }
+
+      if (parsedPubs.length) {
+        papersContainer.innerHTML = '';
+        parsedPubs.forEach(pub => addPaper(pub));
+      }
+
+      uploadStatus.textContent = `Draft generated from CV text. Parsed publications: ${parsedPubs.length}. Please review and correct all auto-filled entries before relying on the analysis.`;
+    }
+
+    async function extractTextFromFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (ext === 'txt') {
+        return await file.text();
+      }
+      if (ext === 'docx') {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        return result.value || '';
+      }
+      if (ext === 'pdf') {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs');
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        return text;
+      }
+      throw new Error('Unsupported file type. Please upload DOCX, TXT, or PDF.');
+    }
+
+    async function loadCvAndDraft(onlyPubs = false) {
+      const file = cvFileInput.files[0];
+      if (!file) {
+        uploadStatus.textContent = 'Please choose a CV file first.';
+        return;
+      }
+      uploadStatus.textContent = `Reading ${file.name} ...`;
+      try {
+        const text = await extractTextFromFile(file);
+        extractedCvText = normalizeWhitespace(text);
+        cvTextPreview.textContent = extractedCvText || 'No text extracted.';
+        autoPopulateFromCv(extractedCvText, onlyPubs);
+      } catch (err) {
+        uploadStatus.textContent = `Extraction failed: ${err.message}`;
+        cvTextPreview.textContent = 'Extraction failed.';
+      }
+    }
+
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function safeRatio(a, b) {
+      if (!b || b <= 0) return 0;
+      return a / b;
+    }
+
+    function scoreJournal(journalStanding) {
+      const map = {
+        top: 18,
+        strong: 14,
+        moderate: 9,
+        unclear: 4
+      };
+      return map[journalStanding] || 0;
+    }
+
+    function scoreAuthorship(authorship) {
+      const map = {
+        first: 16,
+        cofirst: 14,
+        corresponding: 15,
+        senior: 15,
+        second: 8,
+        coauthor: 4
+      };
+      return map[authorship] || 0;
+    }
+
+    function scoreCitationVolume(citations, recentCitations) {
+      let score = 0;
+
+      if (citations >= 300) score += 24;
+      else if (citations >= 150) score += 20;
+      else if (citations >= 80) score += 16;
+      else if (citations >= 40) score += 12;
+      else if (citations >= 20) score += 8;
+      else if (citations >= 10) score += 5;
+      else if (citations > 0) score += 2;
+
+      if (recentCitations >= 100) score += 10;
+      else if (recentCitations >= 50) score += 8;
+      else if (recentCitations >= 20) score += 6;
+      else if (recentCitations >= 10) score += 4;
+      else if (recentCitations >= 5) score += 2;
+
+      return clamp(score, 0, 34);
+    }
+
+    function scoreMomentum(citations, recentCitations) {
+      if (!citations && !recentCitations) return 0;
+      const ratio = safeRatio(recentCitations, citations);
+
+      if (recentCitations >= 20 && ratio >= 0.45) return 12;
+      if (recentCitations >= 10 && ratio >= 0.35) return 9;
+      if (recentCitations >= 5 && ratio >= 0.25) return 6;
+      if (recentCitations > 0) return 3;
+      return 0;
+    }
+
+    function scoreQualitativeFlags(paper) {
+      let score = 0;
+      if (paper.core) score += 8;
+      if (paper.independent) score += 12;
+      if (paper.methodAdoption) score += 10;
+      if (paper.patent || paper.patentLink) score += 10;
+
+      if (paper.linkToCurrent && paper.linkToCurrent.length > 30) score += 8;
+      if (paper.developmentRole && paper.developmentRole.length > 30) score += 8;
+      if (paper.citationQuality && paper.citationQuality.length > 30) score += 8;
+
+      if (paper.selfConcern) score -= 10;
+
+      return clamp(score, -10, 56);
+    }
+
+    function scoreSinglePaper(paper) {
+      const volume = scoreCitationVolume(Number(paper.citations || 0), Number(paper.recentCitations || 0));
+      const authorship = scoreAuthorship(paper.authorship);
+      const journal = scoreJournal(paper.journalStanding);
+      const momentum = scoreMomentum(Number(paper.citations || 0), Number(paper.recentCitations || 0));
+      const qualitative = scoreQualitativeFlags(paper);
+
+      const raw = volume + authorship + journal + momentum + qualitative;
+      const total = clamp(raw, 0, 100);
+
+      let level = 'Weak';
+      if (total >= 75) level = 'Strong';
+      else if (total >= 58) level = 'Solid';
+      else if (total >= 40) level = 'Borderline';
+
+      return {
+        total,
+        level,
+        breakdown: {
+          volume,
+          authorship,
+          journal,
+          momentum,
+          qualitative
+        }
+      };
+    }
+
+    function scoreFieldContext(fieldContext) {
+      const text = (fieldContext || '').toLowerCase();
+      if (!text) return 0;
+
+      if (/low citation|citations are generally low|slow citation/i.test(text)) return 8;
+      if (/moderate|field-specific|subfield/i.test(text)) return 5;
+      if (/high citation|citation levels can be relatively high/i.test(text)) return 2;
+
+      return 3;
+    }
+
+    function scoreRecordLevel(papers, formData) {
+      const paperScores = papers.map(scoreSinglePaper);
+      const totals = paperScores.map(p => p.total).sort((a, b) => b - a);
+
+      const avgPaperScore = paperScores.length
+        ? paperScores.reduce((s, p) => s + p.total, 0) / paperScores.length
+        : 0;
+
+      const topPaperScore = totals[0] || 0;
+      const secondPaperScore = totals[1] || 0;
+
+      const totalCitations = papers.reduce((sum, p) => sum + Number(p.citations || 0), 0);
+      const totalRecent = papers.reduce((sum, p) => sum + Number(p.recentCitations || 0), 0);
+      const independentCount = papers.filter(p => p.independent).length;
+      const leadershipCount = papers.filter(p => ['first','cofirst','corresponding','senior'].includes(p.authorship)).length;
+      const strongJournalCount = papers.filter(p => ['top','strong'].includes(p.journalStanding)).length;
+      const currentLinkCount = papers.filter(p => p.linkToCurrent && p.linkToCurrent.length > 20).length;
+      const developmentCount = papers.filter(p => p.developmentRole && p.developmentRole.length > 20).length;
+      const selfConcernCount = papers.filter(p => p.selfConcern).length;
+      const patentCount = papers.filter(p => p.patent || p.patentLink).length;
+      const methodCount = papers.filter(p => p.methodAdoption).length;
+
+      let score = 0;
+
+      score += clamp(avgPaperScore * 0.38, 0, 38);
+      score += clamp(topPaperScore * 0.16, 0, 16);
+      score += clamp(secondPaperScore * 0.08, 0, 8);
+
+      if (papers.length >= 5) score += 8;
+      else if (papers.length >= 3) score += 5;
+      else if (papers.length >= 2) score += 3;
+
+      if (totalCitations >= 500) score += 10;
+      else if (totalCitations >= 200) score += 8;
+      else if (totalCitations >= 100) score += 6;
+      else if (totalCitations >= 50) score += 4;
+      else if (totalCitations >= 20) score += 2;
+
+      if (totalRecent >= 100) score += 8;
+      else if (totalRecent >= 40) score += 6;
+      else if (totalRecent >= 15) score += 4;
+      else if (totalRecent >= 5) score += 2;
+
+      if (independentCount >= 3) score += 10;
+      else if (independentCount >= 2) score += 7;
+      else if (independentCount >= 1) score += 3;
+
+      if (leadershipCount >= 3) score += 8;
+      else if (leadershipCount >= 2) score += 6;
+      else if (leadershipCount >= 1) score += 3;
+
+      if (strongJournalCount >= 3) score += 7;
+      else if (strongJournalCount >= 2) score += 5;
+      else if (strongJournalCount >= 1) score += 2;
+
+      if (currentLinkCount >= 2) score += 10;
+      else if (formData.researchConnection) score += 6;
+
+      if (developmentCount >= 2) score += 8;
+      else if (developmentCount >= 1) score += 4;
+
+      if (formData.translationEvidence || patentCount > 0) score += 8;
+      if (methodCount > 0) score += 5;
+      if (formData.geographicSpread) score += 4;
+      if (formData.independentRecognition) score += 5;
+      if (formData.currentImportance) score += 5;
+
+      score += scoreFieldContext(formData.fieldContext);
+
+      if (selfConcernCount >= 2) score -= 10;
+      else if (selfConcernCount === 1) score -= 6;
+
+      const finalScore = clamp(Math.round(score), 0, 100);
+
+      let recordLevel = 'Weak';
+      if (finalScore >= 78) recordLevel = 'Strong';
+      else if (finalScore >= 62) recordLevel = 'Solid';
+      else if (finalScore >= 45) recordLevel = 'Borderline';
+
+      let citationStrength = 'Weak';
+      if (totalCitations >= 150 || topPaperScore >= 75) citationStrength = 'Strong';
+      else if (totalCitations >= 50 || topPaperScore >= 58) citationStrength = 'Moderate';
+
+      let viability = 'High';
+      if (recordLevel === 'Borderline') viability = 'Moderate';
+      if (recordLevel === 'Weak') viability = 'Low';
+
+      let evidenceRisk = 'Low';
+      if (independentCount < 2 || currentLinkCount < 1) evidenceRisk = 'Moderate';
+      if (selfConcernCount > 0 || independentCount === 0) evidenceRisk = 'Elevated';
+
+      return {
+        finalScore,
+        recordLevel,
+        citationStrength,
+        viability,
+        evidenceRisk,
+        totalCitations,
+        totalRecent,
+        paperScores
+      };
+    }
+
+    function levelColorClass(level) {
+      if (level === 'Strong') return 'badge-green';
+      if (level === 'Solid') return 'badge-blue';
+      if (level === 'Borderline') return 'badge-gold';
+      return 'badge-orange';
+    }
+
+    function analyze() {
+      const currentResearch = textValue('currentResearch');
+      const currentImportance = textValue('currentImportance');
+      const researchConnection = textValue('researchConnection');
+      const fieldContext = textValue('fieldContext');
+      const independentRecognition = textValue('independentRecognition');
+      const translationEvidence = textValue('translationEvidence');
+      const geographicSpread = textValue('geographicSpread');
+      const reflectionInput = textValue('reflectionInput');
+      const attorneyNotesInput = textValue('attorneyNotesInput');
+      const clientFacingNotes = textValue('clientFacingNotes');
+
+      const papers = [...papersContainer.querySelectorAll('.paper')]
+        .map(readPaper)
+        .filter(p => p.title || p.citations || p.linkToCurrent || p.citationQuality);
+
+      if (!currentResearch && papers.length === 0) {
+        resultsArea.innerHTML = '<div class="soft-card">Please enter at least a current research description or one publication before generating analysis.</div>';
+        return;
+      }
+
+      const formData = {
+        currentResearch,
+        currentImportance,
+        researchConnection,
+        fieldContext,
+        independentRecognition,
+        translationEvidence,
+        geographicSpread
+      };
+
+      const adjudication = scoreRecordLevel(papers, formData);
+
+      const totalCitations = adjudication.totalCitations;
+      const totalRecent = adjudication.totalRecent;
+      const topPaper = [...papers].sort((a, b) => Number(b.citations || 0) - Number(a.citations || 0))[0];
+      const corePapers = papers.filter(p => p.core);
+      const independentCount = papers.filter(p => p.independent).length;
+      const selfConcernCount = papers.filter(p => p.selfConcern).length;
+      const leadershipCount = papers.filter(p => ['first','cofirst','corresponding','senior'].includes(p.authorship)).length;
+      const strongJournalCount = papers.filter(p => ['top','strong'].includes(p.journalStanding)).length;
+      const patentCount = papers.filter(p => p.patent || p.patentLink).length;
+      const methodCount = papers.filter(p => p.methodAdoption).length;
+      const currentLinkCount = papers.filter(p => p.linkToCurrent && p.linkToCurrent.length > 20).length;
+      const developmentCount = papers.filter(p => p.developmentRole && p.developmentRole.length > 20).length;
+      const concentrated = papers.length > 0 && papers.some(p => Number(p.citations || 0) >= Math.max(1, Math.floor(totalCitations * 0.5)));
+      const rising = papers.filter(
+        p => Number(p.recentCitations || 0) >= Math.max(5, Math.floor(Number(p.citations || 0) * 0.35)) &&
+        Number(p.recentCitations || 0) > 0
+      ).length;
+
+      const badges = [];
+      const summary = [];
+      const reflection = [];
+      const strengths = [];
+      const caution = [];
+      const attorney = [];
+      const client = [];
+
+      badges.push([`Record Level: ${adjudication.recordLevel}`, levelColorClass(adjudication.recordLevel)]);
+      badges.push([`Citation Strength: ${adjudication.citationStrength}`, 'badge-blue']);
+      badges.push([`NIW Viability: ${adjudication.viability}`, adjudication.viability === 'High' ? 'badge-green' : adjudication.viability === 'Moderate' ? 'badge-gold' : 'badge-orange']);
+      badges.push([`Evidence Risk: ${adjudication.evidenceRisk}`, adjudication.evidenceRisk === 'Low' ? 'badge-green' : adjudication.evidenceRisk === 'Moderate' ? 'badge-gold' : 'badge-orange']);
+
+      if (currentResearch) summary.push(`The current work is described as follows: ${escapeHtml(currentResearch)}.`);
+
+      summary.push('This public preview intentionally omits internal scoring, weighting, and adjudication thresholds used in attorney review.');
+
+      if (currentLinkCount >= 2 || researchConnection) {
+        badges.push(['Coherent research trajectory', 'badge-blue']);
+        summary.push('The publication record appears capable of being organized as a coherent line of research rather than a disconnected set of papers.');
+        reflection.push('The record invites the researcher to see prior publications not merely as items on a CV, but as steps in the development of a continuing research program.');
+        strengths.push('The connection between past publications and present work appears sufficiently strong to support a continuity narrative.');
+      } else {
+        caution.push('The relationship between prior publications and the present endeavor should be stated much more explicitly.');
+      }
+
+      if (corePapers.length > 0 || concentrated) {
+        badges.push(['Core-publication structure', 'badge-gold']);
+        summary.push('At least part of the citation profile appears to revolve around one or more core publications, which may serve as the intellectual center of the record.');
+        reflection.push('A concentration of citations in a core publication does not necessarily indicate weakness; it may identify the publication through which the applicant’s influence first became visible.');
+        strengths.push('The record appears to contain a central publication that can anchor the broader explanation of influence.');
+        if (topPaper && topPaper.title) {
+          attorney.push(`If the record is centered on ${escapeHtml(topPaper.title)}, explain why that publication mattered and how later work extended or operationalized it.`);
+        }
+      } else if (papers.length > 1) {
+        summary.push('Citation activity appears more distributed across the publication record rather than concentrated in a single dominant paper.');
+      }
+
+      if (independentCount >= 2 || independentRecognition) {
+        badges.push(['Independent recognition', 'badge-green']);
+        strengths.push('There appears to be meaningful independent recognition beyond the applicant’s immediate authorship circle.');
+        reflection.push('This record is not merely a set of self-contained publications; there are signs that other researchers or institutions have engaged with the work on their own terms.');
+      } else {
+        caution.push('Independent citation quality should be developed more clearly through identifiable institutions, researchers, or professional bodies.');
+      }
+
+      if (selfConcernCount > 0) {
+        badges.push(['Citation-quality caution', 'badge-orange']);
+        caution.push('Self-citation concerns should be addressed directly so that the record is not interpreted as internally sustained influence.');
+        attorney.push('Where self-citation is present, foreground the best independent citations and avoid relying too heavily on raw numerical totals.');
+      }
+
+      if (leadershipCount > 0) {
+        strengths.push('The authorship pattern includes papers suggesting that the applicant played a leading, corresponding, or senior role in at least part of the publication record.');
+      } else if (papers.length > 0) {
+        caution.push('If the applicant rarely appears in a leading authorship position, the nature of the applicant’s contribution should be documented with particular care.');
+      }
+
+      if (strongJournalCount > 0) {
+        strengths.push('At least part of the record appears in journals with meaningful standing within the field.');
+      } else if (papers.length > 0) {
+        caution.push('The journals should be explained in field-specific terms rather than assumed to carry weight on title alone.');
+      }
+
+      if (patentCount > 0 || translationEvidence) {
+        badges.push(['Translation beyond academia', 'badge-gold']);
+        summary.push('The record includes indications that the work may have moved beyond publication into technical, industrial, or implementation-related use.');
+        reflection.push('From an NIW perspective, this may help the researcher understand that the value of the work is not confined to academic citation alone.');
+        strengths.push('There is at least some evidence that the research has technical, patent-related, or applied relevance beyond the publication itself.');
+      }
+
+      if (methodCount > 0) strengths.push('The record suggests that methods or approaches introduced by the applicant have been used or adopted by others.');
+
+      if (rising > 0 || totalRecent >= Math.max(10, Math.floor(totalCitations * 0.35))) {
+        badges.push(['Current or growing influence', 'badge-blue']);
+        summary.push('Recent citation activity suggests that the work may still be gaining relevance rather than reflecting only past recognition.');
+        reflection.push('This can help the researcher see the record not as closed or historical, but as part of an ongoing and developing influence in the field.');
+      }
+
+      if (developmentCount > 0) strengths.push('The entered descriptions suggest that the publications can be understood as developing stages of a broader intellectual project.');
+      if (geographicSpread) strengths.push('The spread of citing or using institutions may help demonstrate that the work has reached beyond a narrow local or internal network.');
+      if (fieldContext) attorney.push('The citation record should be interpreted against the norms of this specific field. A moderate number in one discipline may carry greater significance than a larger number in another.');
+      if (currentImportance) attorney.push('The current importance statement should be integrated with the publication record so that the applicant’s past work and future endeavor read as part of one coherent account.');
+
+      reflection.push('The most valuable function of this framework is to prompt the researcher to reconsider the publication record in terms of meaning, continuity, influence, and future direction rather than raw paper counts.');
+      if (reflectionInput) reflection.push(escapeHtml(reflectionInput));
+
+      if (clientFacingNotes) client.push(escapeHtml(clientFacingNotes));
+      if (!client.length) {
+        if (currentLinkCount >= 2) client.push('The record appears strongest where earlier publications can be tied directly to the applicant’s present work.');
+        if (independentCount < 2) client.push('The next useful step may be to identify stronger outside citations and to explain who relied on the work.');
+        if (!translationEvidence && patentCount === 0) client.push('If the work has affected technical practice, products, methods, or real-world implementation, that evidence should be gathered and described.');
+      }
+
+      if (!strengths.length) strengths.push('The available facts suggest some research activity, but the strongest themes still need to be clarified and organized.');
+      if (!caution.length) caution.push('No major structural weakness is immediately apparent from the information entered, although documentary support remains essential.');
+      if (attorneyNotesInput) attorney.push(`Case-specific strategic note: ${escapeHtml(attorneyNotesInput)}`);
+
+      const html = `
+        <div class="result-block">
+          <h3>Public Structural Snapshot</h3>
+          <div>${badges.map(([t,c]) => `<span class="badge ${c}">${escapeHtml(t)}</span>`).join('')}</div>
+          <p><strong>Public note:</strong> This preview intentionally withholds internal scoring and adjudication thresholds.</p>
+          <p class="small">Publications entered: ${papers.length} &nbsp;|&nbsp; Total citations entered: ${totalCitations} &nbsp;|&nbsp; Recent citations entered: ${totalRecent}</p>
+        </div>
+
+        <div class="result-block">
+          <h3>NIW-Oriented Research Summary</h3>
+          <p>${sentenceFromList(summary)}</p>
+        </div>
+
+        <div class="result-block">
+          <h3>What This Record May Help the Researcher See</h3>
+          <ul>${reflection.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="result-block">
+          <h3>Indicators of Influence</h3>
+          <ul>${strengths.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="result-block warn">
+          <h3>Issues Requiring Caution</h3>
+          <ul>${caution.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="result-block">
+          <h3>Attorney Framing Points</h3>
+          <ul>${attorney.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="result-block">
+          <h3>Client-Facing Observations</h3>
+          <ul>${client.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="result-block">
+          <h3>Paper-Level Internal Breakdown</h3>
+          ${
+            adjudication.paperScores.length
+              ? adjudication.paperScores.map((ps, idx) => {
+                  const p = papers[idx];
+                  return `
+                    <div style="padding:12px 0; border-top:${idx === 0 ? 'none' : '1px solid var(--line)'};">
+                      <strong>${escapeHtml(p.title || `Publication ${idx + 1}`)}</strong>
+                      <div style="margin-top:8px;">
+                        <span class="badge ${levelColorClass(ps.level)}">${escapeHtml(ps.level)}</span>
+                        <span class="badge badge-blue">Paper Score: ${ps.total}/100</span>
+                      </div>
+                      <p class="small">
+                        Volume ${ps.breakdown.volume} |
+                        Authorship ${ps.breakdown.authorship} |
+                        Journal ${ps.breakdown.journal} |
+                        Momentum ${ps.breakdown.momentum} |
+                        Qualitative ${ps.breakdown.qualitative}
+                      </p>
+                    </div>
+                  `;
+                }).join('')
+              : '<p>No paper-level data available.</p>'
+          }
+        </div>
+
+        <div class="result-block">
+          <h3>Publication Snapshot</h3>
+          ${papers.length ? papers.map((p, idx) => `
+            <div style="padding:12px 0; border-top:${idx === 0 ? 'none' : '1px solid var(--line)'};">
+              <strong>${escapeHtml(p.title || `Publication ${idx + 1}`)}</strong><br />
+              <span class="small">Year: ${p.year || '—'} | Citations: ${p.citations || 0} | Recent citations: ${p.recentCitations || 0} | Authorship: ${formatAuthorship(p.authorship)} | Journal standing: ${formatJournal(p.journalStanding)}</span>
+              ${p.linkToCurrent ? `<p style="margin:8px 0 0;"><strong>Relation to current research:</strong> ${escapeHtml(p.linkToCurrent)}</p>` : ''}
+              ${p.citationQuality ? `<p style="margin:8px 0 0;"><strong>Citation quality:</strong> ${escapeHtml(p.citationQuality)}</p>` : ''}
+              ${p.patentLink ? `<p style="margin:8px 0 0;"><strong>Patent / technical linkage:</strong> ${escapeHtml(p.patentLink)}</p>` : ''}
+              ${p.developmentRole ? `<p style="margin:8px 0 0;"><strong>Role in research development:</strong> ${escapeHtml(p.developmentRole)}</p>` : ''}
+            </div>
+          `).join('') : '<p>No publication entries provided.</p>'}
+        </div>
+      `;
+
+      resultsArea.innerHTML = html;
+    }
+
+    function resetAll() {
+      document.querySelectorAll('textarea, input[type="text"], input[type="number"]').forEach(el => el.value = '');
+      document.querySelectorAll('select').forEach(el => el.value = '');
+      document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+      papersContainer.innerHTML = '';
+      addPaper();
+      extractedCvText = '';
+      cvTextPreview.textContent = 'No extracted text yet.';
+      uploadStatus.textContent = 'No file loaded yet.';
+      resultsArea.innerHTML = '<div class="soft-card">After entering the research and publication record, click <strong>Generate Analysis</strong>. The tool will produce a narrative assessment showing how the record may be understood from an NIW perspective, including indicators of influence, issues requiring caution, and framing points for legal analysis.</div>';
+    }
+
+    function loadSample() {
+      resetAll();
+      document.getElementById('applicantName').value = 'Yeeun Bae';
+      document.getElementById('currentOrg').value = 'Indiana University, Postdoctoral Researcher';
+      document.getElementById('currentResearch').value = 'The applicant is currently developing AI-enabled imaging triage methods for clinical decision support, with a focus on explainability and deployment feasibility in hospital settings.';
+      document.getElementById('currentImportance').value = 'The present work addresses reliability and speed in time-sensitive care environments and may affect both workflow efficiency and patient screening decisions.';
+      document.getElementById('researchConnection').value = 'The current project grows directly out of earlier publications on image classification, interpretable model design, and validation methods suited for practical deployment.';
+      document.getElementById('fieldContext').value = 'In AI and medical imaging, citation levels can be relatively high, so raw citation numbers should be interpreted in field context rather than in isolation.';
+      document.getElementById('independentRecognition').value = 'The applicant has been invited to present at university-affiliated workshops, and the work has been cited by hospital researchers, a national lab group, and several independent universities.';
+      document.getElementById('translationEvidence').value = 'One core publication contributed to a provisional patent concept and later informed an implementation-oriented collaboration involving workflow triage.';
+      document.getElementById('geographicSpread').value = 'Citing institutions include groups in the United States, Germany, South Korea, and Canada.';
+      document.getElementById('reflectionInput').value = 'This record suggests that one early publication became the point through which the applicant’s influence first became visible, while later publications strengthened the practical and methodological reach of that work.';
+      document.getElementById('attorneyNotesInput').value = 'Need stronger exhibit support showing how independent clinical groups relied on the work.';
+      document.getElementById('clientFacingNotes').value = 'The strongest part of the record appears to be the way the current work grows naturally out of the earlier core publication.';
+
+      papersContainer.innerHTML = '';
+      addPaper({
+        title: 'Explainable Deep Learning for Emergency Imaging Triage',
+        year: 2022,
+        citations: 68,
+        recentCitations: 41,
+        authorship: 'first',
+        journalStanding: 'strong',
+        linkToCurrent: 'This publication established the triage framework now being adapted for deployment-oriented clinical workflow use.',
+        citationQuality: 'Cited by academic medical centers, a national laboratory group, and several independent university teams. Some self-citation exists but does not dominate the record.',
+        patentLink: 'Linked to a provisional patent concept concerning prioritization architecture.',
+        developmentRole: 'Introduced the applicant’s central method and became the conceptual basis for later applied work.',
+        core: true,
+        independent: true,
+        selfConcern: false,
+        patent: true,
+        methodAdoption: true
+      });
+      addPaper({
+        title: 'Interpretable Validation Strategies for Clinical AI Models',
+        year: 2023,
+        citations: 24,
+        recentCitations: 19,
+        authorship: 'corresponding',
+        journalStanding: 'top',
+        linkToCurrent: 'This publication connects directly to the applicant’s present emphasis on explainability, validation, and practical implementation reliability.',
+        citationQuality: 'Cited by independent healthcare AI researchers and referenced in one implementation-oriented white paper.',
+        patentLink: 'No direct patent linkage, but the validation framework appears to have influenced later deployment discussions.',
+        developmentRole: 'Extended the earlier method from proof-of-concept into reliability and adoption-oriented validation.',
+        core: false,
+        independent: true,
+        selfConcern: false,
+        patent: false,
+        methodAdoption: true
+      });
+      analyze();
+    }
+
+    analyzeBtn.addEventListener('click', analyze);
+    addPaperBtn.addEventListener('click', () => addPaper());
+    addPaperBtnBottom.addEventListener('click', () => addPaper());
+    loadSampleBtn.addEventListener('click', loadSample);
+    printBtn.addEventListener('click', () => window.print());
+    resetBtn.addEventListener('click', resetAll);
+    extractCvBtn.addEventListener('click', () => loadCvAndDraft(false));
+    parsePublicationsBtn.addEventListener('click', () => loadCvAndDraft(true));
+
+    addPaper();
+  </script>
+</body>
+</html>
